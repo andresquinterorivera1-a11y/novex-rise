@@ -6,12 +6,19 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      runner:
+        description: Mac de GitHub donde compilar
+        type: choice
+        default: macos-15-intel
+        options: [macos-15-intel, macos-15, macos-26]
 
 jobs:
   build:
     name: Compilar .ipa sin firmar
-    runs-on: macos-15
-    timeout-minutes: 30
+    # Las Mac Intel suelen tener menos cola que las Apple Silicon (arm64).
+    runs-on: ${{ inputs.runner || 'macos-15-intel' }}
+    timeout-minutes: 45
 
     steps:
       - name: Descargar el código
