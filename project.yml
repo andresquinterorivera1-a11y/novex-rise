@@ -1,0 +1,83 @@
+# NOVEX RISE — definición del proyecto para XcodeGen.
+# No necesitas una Mac: GitHub Actions convierte este archivo en un proyecto
+# de Xcode (.xcodeproj) y compila la app en un servidor macOS gratuito.
+
+name: NovexRise
+
+options:
+  bundleIdPrefix: com.novexrise
+  developmentLanguage: es
+  deploymentTarget:
+    iOS: "16.1"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    TARGETED_DEVICE_FAMILY: "1"
+    CODE_SIGN_STYLE: Automatic
+
+targets:
+  # ------------------------------------------------------------------
+  # App principal
+  # ------------------------------------------------------------------
+  NovexRise:
+    type: application
+    platform: iOS
+    sources:
+      - path: NovexRise
+      - path: Shared
+    dependencies:
+      - target: NovexRiseWidgets
+    scheme: {}
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.novexrise.app
+        PRODUCT_NAME: NovexRise
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+    info:
+      path: Config/NovexRise-Info.plist
+      properties:
+        CFBundleDisplayName: NOVEX RISE
+        CFBundleDevelopmentRegion: es
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        CFBundleURLTypes:
+          - CFBundleURLName: com.novexrise.app
+            CFBundleURLSchemes:
+              - novexrise
+        NSSupportsLiveActivities: true
+        ITSAppUsesNonExemptEncryption: false
+        UIUserInterfaceStyle: Dark
+        UIRequiresFullScreen: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+
+  # ------------------------------------------------------------------
+  # Extensión de widgets: Live Activity (pantalla de bloqueo + Isla Dinámica)
+  # ------------------------------------------------------------------
+  NovexRiseWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: NovexRiseWidgets
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.novexrise.app.widgets
+        PRODUCT_NAME: NovexRiseWidgets
+        SKIP_INSTALL: YES
+    info:
+      path: Config/NovexRiseWidgets-Info.plist
+      properties:
+        CFBundleDisplayName: NOVEX RISE
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension

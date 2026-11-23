@@ -1,0 +1,15 @@
+# Generado por XcodeGen en GitHub Actions
+NovexRise.xcodeproj/
+Config/*.plist
+
+# Compilación
+build/
+DerivedData/
+Payload/
+*.ipa
+*.xcuserstate
+xcuserdata/
+
+# Sistema
+.DS_Store
+Thumbs.db
