@@ -10,7 +10,9 @@ struct PauseRequest: Identifiable, Equatable {
     }
 
     let id = UUID()
-    let app: ControlledApp
+    /// `nil` cuando una sola automatización cubre varias apps:
+    /// la pausa pregunta a cuál ibas.
+    let app: ControlledApp?
     let mode: Mode
 }
 
@@ -21,7 +23,7 @@ final class AppRouter: ObservableObject {
 
     @Published var pause: PauseRequest?
 
-    func presentPause(for app: ControlledApp, mode: PauseRequest.Mode = .entry) {
+    func presentPause(for app: ControlledApp?, mode: PauseRequest.Mode = .entry) {
         pause = PauseRequest(app: app, mode: mode)
     }
 
@@ -29,17 +31,16 @@ final class AppRouter: ObservableObject {
         pause = nil
     }
 
-    /// novexrise://pausa?app=instagram  ·  novexrise://tiempo?app=instagram
+    /// novexrise://pausa  ·  novexrise://pausa?app=instagram  ·  novexrise://tiempo?app=instagram
     func handle(url: URL) {
-        guard url.scheme == "novexrise",
-              let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              let value = components.queryItems?.first(where: { $0.name == "app" })?.value,
-              let app = ControlledApp(rawValue: value.lowercased())
-        else { return }
+        guard url.scheme == "novexrise" else { return }
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        let value = components?.queryItems?.first(where: { $0.name == "app" })?.value
+        let app = value.flatMap { ControlledApp(rawValue: $0.lowercased()) }
 
         switch url.host {
         case "tiempo":
-            presentPause(for: app, mode: .timeUp)
+            if let app { presentPause(for: app, mode: .timeUp) }
         default:
             presentPause(for: app, mode: .entry)
         }

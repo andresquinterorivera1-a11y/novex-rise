@@ -114,17 +114,27 @@ Usaremos **Sideloadly** (gratis), que firma la app con tu Apple ID gratuito.
 ### 4. Primer uso
 
 1. Abre NOVEX RISE y completa las 5 pantallas: bienvenida → metas → apps → avisos → tutorial.
-2. Sigue el tutorial para crear la automatización en **Atajos** (una por app):
+2. Sigue el tutorial para crear **una sola** automatización en **Atajos** para todas tus apps.
 
-```
-Cuando «Instagram» se abra  (Ejecutar inmediatamente)
-  1. ¿Puedo entrar a Instagram?                 ← acción de NOVEX RISE
-  2. Si [Resultado] es «pausa»
-       Abrir pausa consciente para Instagram     ← acción de NOVEX RISE
-     Fin de si
-```
+   **iOS 26 o posterior** (una acción):
 
-3. Abre Instagram: debe aparecer la respiración de NOVEX RISE.
+   ```
+   Cuando «Instagram», «TikTok», «YouTube»… se abra  (Ejecutar inmediatamente)
+     Pausa NOVEX RISE                               ← acción de NOVEX RISE
+   ```
+
+   **iOS 18 o anterior** (dos acciones y un «Si»):
+
+   ```
+   Cuando «Instagram», «TikTok», «YouTube»… se abra  (Ejecutar inmediatamente)
+     1. ¿Puedo entrar?                              ← acción de NOVEX RISE
+     2. Si [Resultado] es «pausa»
+          Abrir pausa consciente                    ← acción de NOVEX RISE
+        Fin de si
+   ```
+
+3. Abre Instagram: debe aparecer la respiración de NOVEX RISE y luego
+   «¿Qué app ibas a abrir?».
 
 **Si las acciones de NOVEX RISE no aparecen en Atajos:** abre NOVEX RISE una vez,
 ciérrala y vuelve a buscar «NOVEX RISE» en las acciones.

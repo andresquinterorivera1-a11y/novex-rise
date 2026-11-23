@@ -73,10 +73,13 @@ final class NovexStore: ObservableObject {
 
     // MARK: - Pausa consciente
 
-    /// ¿Hay un permiso activo para esta app? Lo consulta la automatización de Atajos.
-    func canEnter(_ app: ControlledApp) -> Bool {
-        guard let session = state.session else { return false }
-        return session.app == app && session.isActive()
+    /// ¿Hay un permiso activo? Lo consulta la automatización de Atajos.
+    /// Sin app concreta (una sola automatización para todas las apps),
+    /// basta con que haya una sesión activa.
+    func canEnter(_ app: ControlledApp?) -> Bool {
+        guard let session = state.session, session.isActive() else { return false }
+        guard let app else { return true }
+        return session.app == app
     }
 
     /// Registra un intento de apertura y devuelve cuántos van hoy con esa app.

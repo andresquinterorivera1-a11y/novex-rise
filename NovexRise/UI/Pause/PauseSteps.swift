@@ -1,5 +1,68 @@
 import SwiftUI
 
+// MARK: - ¿Qué app ibas a abrir?
+
+/// Aparece cuando una sola automatización cubre varias apps
+/// y NOVEX RISE no sabe cuál abriste.
+struct AppChoiceStepView: View {
+    let apps: [ControlledApp]
+    let onSelect: (ControlledApp) -> Void
+
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 3)
+
+    var body: some View {
+        VStack(spacing: 20) {
+            NovexLogo(markSize: 34)
+                .padding(.top, 12)
+
+            Spacer(minLength: 0)
+
+            Text("¿Qué app ibas a abrir?")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+
+            Text("Ponerle nombre al impulso ya es tomar el control.")
+                .font(.callout)
+                .foregroundColor(Palette.secondary)
+                .multilineTextAlignment(.center)
+
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 12) {
+                    ForEach(apps) { app in
+                        Button {
+                            onSelect(app)
+                        } label: {
+                            VStack(spacing: 8) {
+                                AppBadge(app: app, size: 48)
+                                Text(app.name)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundColor(.white)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+                            }
+                            .frame(maxWidth: .infinity, minHeight: 96)
+                            .background(
+                                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                    .fill(Palette.card)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                    .stroke(Palette.stroke, lineWidth: 1)
+                            )
+                            .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(app.name)
+                    }
+                }
+            }
+
+            Spacer(minLength: 0)
+        }
+    }
+}
+
 // MARK: - ¿De verdad quieres entrar?
 
 struct QuestionStepView: View {

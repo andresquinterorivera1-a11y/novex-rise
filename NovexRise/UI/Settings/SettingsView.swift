@@ -15,7 +15,7 @@ struct SettingsView: View {
             } header: {
                 Text("Apps con pausa consciente")
             } footer: {
-                Text("Después de elegir, crea su automatización en Atajos (abajo).")
+                Text("Si añades una app, márcala también en tu automatización de Atajos (abajo).")
             }
 
             Section {
@@ -60,7 +60,7 @@ struct SettingsView: View {
             }
 
             Section {
-                LabeledContent("Versión", value: "NOVEX RISE Lite 0.1")
+                LabeledContent("Versión", value: "NOVEX RISE Lite 0.2")
                 Text("El bloqueo total con la Screen Time API de Apple llegará en la versión completa.")
                     .font(.footnote)
                     .foregroundColor(Palette.secondary)

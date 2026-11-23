@@ -13,8 +13,8 @@ struct ShortcutsTutorialView: View {
     }
 }
 
-/// Tutorial paso a paso para crear la automatización en la app Atajos.
-/// Cada paso lleva una ilustración simplificada de lo que verás en pantalla.
+/// Tutorial para crear UNA automatización en Atajos que cubre todas tus apps.
+/// En iOS 26 o posterior basta con una acción; en versiones anteriores hacen falta dos y un «Si».
 struct ShortcutsTutorialContent: View {
     @EnvironmentObject private var store: NovexStore
     @EnvironmentObject private var router: AppRouter
@@ -22,8 +22,17 @@ struct ShortcutsTutorialContent: View {
 
     private static let shortcutsURL = URL(string: "shortcuts://")
 
-    private var exampleApp: ControlledApp {
-        store.state.selectedApps.first ?? .instagram
+    private var apps: [ControlledApp] {
+        store.state.selectedApps.isEmpty ? [.instagram, .tiktok, .youtube] : store.state.selectedApps
+    }
+
+    private var appNames: String {
+        apps.map(\.name).joined(separator: ", ")
+    }
+
+    private var supportsOneAction: Bool {
+        if #available(iOS 26.0, *) { return true }
+        return false
     }
 
     var body: some View {
@@ -32,73 +41,40 @@ struct ShortcutsTutorialContent: View {
                 Text("Haz que la pausa aparezca sola")
                     .font(.title2.bold())
                     .foregroundColor(.white)
-                Text("Con una automatización de Atajos, cada vez que abras \(exampleApp.name) aparecerá NOVEX RISE primero. Se hace una vez por app y tarda 2 minutos.")
+                Text(supportsOneAction
+                     ? "Una sola automatización para todas tus apps. Se hace una vez y tarda 1 minuto."
+                     : "Una sola automatización para todas tus apps. Se hace una vez y tarda 2 minutos.")
                     .font(.callout)
                     .foregroundColor(Palette.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            TutorialStep(number: 1, title: "Abre Atajos y toca «Automatización»", detail: "Está en la barra de abajo de la app Atajos.") {
-                MockTabBar(items: ["Atajos", "Automatización", "Galería"], highlighted: 1)
-            }
+            commonSteps
 
-            TutorialStep(number: 2, title: "Toca «+» o «Nueva automatización» y elige «App»", detail: "Si ya tienes automatizaciones, el botón «+» está arriba a la derecha.") {
-                VStack(spacing: 8) {
-                    MockRow(icon: "clock", text: "Hora del día")
-                    MockRow(icon: "alarm", text: "Alarma")
-                    MockRow(icon: "square.grid.2x2", text: "App", highlighted: true)
+            if supportsOneAction {
+                TutorialStep(number: 4, title: "«Nueva automatización en blanco» → añade «Pausa NOVEX RISE»", detail: "Busca «NOVEX» en las acciones y tócala. No cambies nada más. Toca «OK» y listo.") {
+                    MockActionBlock(lines: [("arrow.up.right", "Pausa NOVEX RISE")])
                 }
-            }
-
-            TutorialStep(number: 3, title: "Elige \(exampleApp.name), marca «Se abre» y «Ejecutar inmediatamente»", detail: "Desactiva «Notificar al ejecutar» si aparece. Luego toca «Siguiente».") {
-                VStack(spacing: 8) {
-                    MockRow(icon: exampleApp.symbol, text: "App: \(exampleApp.name)")
-                    MockRow(icon: "checkmark.circle.fill", text: "Se abre", highlighted: true)
-                    MockRow(icon: "circle", text: "Se cierra")
-                    MockRow(icon: "bolt.fill", text: "Ejecutar inmediatamente", highlighted: true)
-                }
-            }
-
-            TutorialStep(number: 4, title: "«Nueva automatización en blanco» → añade «¿Puedo entrar?»", detail: "Busca «NOVEX RISE» en las acciones y elige la misma app.") {
-                MockActionBlock(lines: [("arrow.up.right", "¿Puedo entrar a \(exampleApp.name)?")])
-            }
-
-            TutorialStep(number: 5, title: "Añade la acción «Si»", detail: "Condición: Si [Resultado] es «pausa». Escribe la palabra pausa tal cual, en minúsculas.") {
-                MockActionBlock(lines: [("arrow.triangle.branch", "Si  Resultado  es  pausa")])
-            }
-
-            TutorialStep(number: 6, title: "Dentro del «Si», añade «Abrir pausa consciente»", detail: "Es otra acción de NOVEX RISE. Elige otra vez \(exampleApp.name). Toca «OK» y listo.") {
-                MockActionBlock(lines: [
-                    ("arrow.triangle.branch", "Si  Resultado  es  pausa"),
-                    ("arrow.up.right", "    Abrir pausa consciente para \(exampleApp.name)"),
-                    ("minus", "Fin de si")
-                ])
-            }
-
-            TutorialStep(number: 7, title: "Repite con cada app", detail: "Crea una automatización por app (cambia la app en los pasos 3, 4 y 6).") {
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(store.state.selectedApps) { app in
-                        HStack(spacing: 10) {
-                            AppBadge(app: app, size: 28)
-                            Text(app.name)
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundColor(.white)
-                            Spacer()
-                        }
-                    }
-                    if store.state.selectedApps.isEmpty {
-                        Text("Elige tus apps en Ajustes.")
-                            .font(.footnote)
-                            .foregroundColor(Palette.secondary)
-                    }
-                }
+            } else {
+                legacySteps
             }
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("¿Por qué el «Si»?")
+                Text("¿Cómo sabe a qué app ibas?")
                     .font(.headline)
                     .foregroundColor(.white)
-                Text("Cuando eliges un tiempo, NOVEX RISE responde «entrar» y Atajos te deja pasar sin repetir la pausa. Cuando el tiempo se acaba, vuelve a responder «pausa».")
+                Text("Después de respirar te pregunta qué app ibas a abrir. Cuando eliges un tiempo, te deja pasar sin repetir la pausa hasta que se acabe.")
+                    .font(.footnote)
+                    .foregroundColor(Palette.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .novexCard()
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("¿Por qué no se activa sola como Ascent?")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                Text("Ascent usa el permiso de Tiempo en pantalla de Apple, que solo se concede a apps de la App Store con cuenta de desarrollador de pago. Instalada gratis, NOVEX RISE necesita esta automatización, que solo tú puedes crear.")
                     .font(.footnote)
                     .foregroundColor(Palette.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -112,10 +88,58 @@ struct ShortcutsTutorialContent: View {
                 .buttonStyle(.novexPrimary)
 
                 Button("Probar la pausa ahora") {
-                    router.presentPause(for: exampleApp)
+                    router.presentPause(for: nil)
                 }
                 .buttonStyle(.novexSecondary)
             }
+        }
+    }
+
+    // MARK: - Pasos 1 a 3 (iguales en todas las versiones)
+
+    @ViewBuilder
+    private var commonSteps: some View {
+        TutorialStep(number: 1, title: "Abre Atajos y toca «Automatización»", detail: "Está en la barra de abajo de la app Atajos.") {
+            MockTabBar(items: ["Atajos", "Automatización", "Galería"], highlighted: 1)
+        }
+
+        TutorialStep(number: 2, title: "Toca «+» y elige «App»", detail: "Si es tu primera automatización, toca «Nueva automatización».") {
+            VStack(spacing: 8) {
+                MockRow(icon: "clock", text: "Hora del día")
+                MockRow(icon: "alarm", text: "Alarma")
+                MockRow(icon: "square.grid.2x2", text: "App", highlighted: true)
+            }
+        }
+
+        TutorialStep(number: 3, title: "Marca TODAS tus apps, «Se abre» y «Ejecutar inmediatamente»", detail: "En «Elegir» marca \(appNames) y toca «OK». Desactiva «Notificar al ejecutar» si aparece. Luego toca «Siguiente».") {
+            VStack(spacing: 8) {
+                ForEach(apps) { app in
+                    MockRow(icon: "checkmark.circle.fill", text: app.name, highlighted: true)
+                }
+                MockRow(icon: "checkmark.circle.fill", text: "Se abre", highlighted: true)
+                MockRow(icon: "bolt.fill", text: "Ejecutar inmediatamente", highlighted: true)
+            }
+        }
+    }
+
+    // MARK: - iOS 18 o anterior
+
+    @ViewBuilder
+    private var legacySteps: some View {
+        TutorialStep(number: 4, title: "«Nueva automatización en blanco» → añade «¿Puedo entrar?»", detail: "Busca «NOVEX» en las acciones. Deja la app vacía.") {
+            MockActionBlock(lines: [("arrow.up.right", "¿Puedo entrar?")])
+        }
+
+        TutorialStep(number: 5, title: "Añade la acción «Si»", detail: "Condición: Si [Resultado] es «pausa». Escribe la palabra pausa tal cual, en minúsculas.") {
+            MockActionBlock(lines: [("arrow.triangle.branch", "Si  Resultado  es  pausa")])
+        }
+
+        TutorialStep(number: 6, title: "Dentro del «Si», añade «Abrir pausa consciente»", detail: "Es otra acción de NOVEX RISE. Deja la app vacía. Toca «OK» y listo.") {
+            MockActionBlock(lines: [
+                ("arrow.triangle.branch", "Si  Resultado  es  pausa"),
+                ("arrow.up.right", "    Abrir pausa consciente"),
+                ("minus", "Fin de si")
+            ])
         }
     }
 }

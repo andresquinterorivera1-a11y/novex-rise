@@ -13,8 +13,8 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "0.1.0"
-    CURRENT_PROJECT_VERSION: "1"
+    MARKETING_VERSION: "0.2.0"
+    CURRENT_PROJECT_VERSION: "2"
     TARGETED_DEVICE_FAMILY: "1"
     CODE_SIGN_STYLE: Automatic
 
@@ -51,6 +51,8 @@ targets:
         NSSupportsLiveActivities: true
         ITSAppUsesNonExemptEncryption: false
         UIUserInterfaceStyle: Dark
+        # Conserva el diseño blanco y negro sin el efecto «Liquid Glass» de iOS 26.
+        UIDesignRequiresCompatibility: true
         UIRequiresFullScreen: true
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait

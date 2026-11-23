@@ -2,7 +2,7 @@ import Foundation
 
 /// Apps que NOVEX RISE puede controlar en la versión gratuita (sin Screen Time API).
 /// Cada una se conecta con una automatización de la app Atajos.
-enum ControlledApp: String, CaseIterable, Codable, Identifiable, Hashable {
+enum ControlledApp: String, CaseIterable, Codable, Identifiable, Hashable, Sendable {
     case instagram, tiktok, youtube, facebook, x, snapchat, whatsapp, reddit, threads, pinterest, twitch, netflix
 
     var id: String { rawValue }
